@@ -1,5 +1,5 @@
 
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
@@ -10,7 +10,7 @@ import { AuthService } from '../../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.css',
 })
 export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -18,11 +18,13 @@ export class LoginComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
+  showPassword = signal(false);
+
   private returnUrl = '/dashboard';
 
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]]
+    password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
   isLoading = this.authService.isLoading;
@@ -40,17 +42,19 @@ export class LoginComponent implements OnInit {
 
     const { email, password } = this.loginForm.value;
 
-    this.authService.login({
-      email: email as string,
-      password: password as string
-    }).subscribe({
-      next: () => {
-        this.router.navigateByUrl(this.returnUrl);
-      },
-      error: (error) => {
-        console.error('Login failed:', error);
-      }
-    });
+    this.authService
+      .login({
+        email: email as string,
+        password: password as string,
+      })
+      .subscribe({
+        next: () => {
+          this.router.navigateByUrl(this.returnUrl);
+        },
+        error: (error) => {
+          console.error('Login failed:', error);
+        },
+      });
   }
 
   get f() {

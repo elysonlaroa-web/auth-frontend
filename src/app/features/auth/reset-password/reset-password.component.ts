@@ -6,70 +6,70 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
-   selector: 'app-reset-password',
-   standalone: true,
-   imports: [CommonModule, ReactiveFormsModule, RouterLink],
-   templateUrl: './reset-password.component.html'
+  selector: 'app-reset-password',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  templateUrl: './reset-password.component.html',
 })
 export class ResetPasswordComponent implements OnInit {
-   private fb = inject(FormBuilder);
-   private authService = inject(AuthService);
-   private route = inject(ActivatedRoute);
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
 
-   private token = '';
-   successMessage: string | null = null;
-   status = signal<'form' | 'success' | 'error'>('form');
-   errorMessage = signal<string>('');
+  showPassword = signal(false);
+  showConfirmPassword = signal(false);
 
-   resetForm = this.fb.group({
-       newPassword: ['', [
-           Validators.required,
-           Validators.minLength(8),
-           Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d)/)
-       ]],
-       confirmPassword: ['', Validators.required]
-   });
+  private token = '';
+  successMessage: string | null = null;
+  status = signal<'form' | 'success' | 'error'>('form');
+  errorMessage = signal<string>('');
 
-   isLoading = this.authService.isLoading;
-   error = this.authService.error;
+  resetForm = this.fb.group({
+    newPassword: [
+      '',
+      [Validators.required, Validators.minLength(8), Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d)/)],
+    ],
+    confirmPassword: ['', Validators.required],
+  });
 
-   ngOnInit(): void {
-       this.token = this.route.snapshot.queryParams['token'] || '';
+  isLoading = this.authService.isLoading;
+  error = this.authService.error;
 
-       if (!this.token) {
-           this.status.set('error');
-           this.errorMessage.set('Invalid reset link');
-       }
-   }
+  ngOnInit(): void {
+    this.token = this.route.snapshot.queryParams['token'] || '';
 
-   onSubmit(): void {
-       if (this.resetForm.invalid) {
-           this.resetForm.markAllAsTouched();
-           return;
-       }
+    if (!this.token) {
+      this.status.set('error');
+      this.errorMessage.set('Invalid reset link');
+    }
+  }
 
-       const { newPassword, confirmPassword } = this.resetForm.value;
+  onSubmit(): void {
+    if (this.resetForm.invalid) {
+      this.resetForm.markAllAsTouched();
+      return;
+    }
 
-       if (newPassword !== confirmPassword) {
-           this.authService['errorSignal'].set('Passwords do not match');
-           return;
-       }
+    const { newPassword, confirmPassword } = this.resetForm.value;
 
-       this.authService.resetPassword(this.token, newPassword!).subscribe({
-           next: (response) => {
-               this.successMessage = response.message;
-               this.status.set('success');
-           },
-           error: (error) => {
-               this.status.set('error');
-               this.errorMessage.set(
-                   error.error?.error?.message || 'Reset failed'
-               );
-           }
-       });
-   }
+    if (newPassword !== confirmPassword) {
+      this.authService['errorSignal'].set('Passwords do not match');
+      return;
+    }
 
-   get f() {
-       return this.resetForm.controls;
-   }
+    this.authService.resetPassword(this.token, newPassword!).subscribe({
+      next: (response) => {
+        this.successMessage = response.message;
+        this.status.set('success');
+      },
+      error: (error) => {
+        this.status.set('error');
+        this.errorMessage.set(error.error?.error?.message || 'Reset failed');
+      },
+    });
+  }
+
+  get f() {
+    return this.resetForm.controls;
+  }
 }

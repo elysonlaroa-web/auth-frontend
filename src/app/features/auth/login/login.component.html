@@ -1,10 +1,7 @@
-
 <div class="auth-container">
-
     <div class="auth-card">
 
         <h1>Welcome Back</h1>
-
         <p class="subtitle">Sign in to your account</p>
 
         @if (error()) {
@@ -15,8 +12,8 @@
 
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
 
+            <!-- Email -->
             <div class="form-group">
-
                 <label for="email">Email</label>
 
                 <input
@@ -29,7 +26,6 @@
 
                 @if (f.email.touched && f.email.invalid) {
                     <small class="error-message">
-
                         @if (f.email.errors?.['required']) {
                             Email is required
                         }
@@ -37,27 +33,65 @@
                         @if (f.email.errors?.['email']) {
                             Please enter a valid email
                         }
-
                     </small>
                 }
-
             </div>
 
+            <!-- Password -->
             <div class="form-group">
-
                 <label for="password">Password</label>
 
-                <input
-                    type="password"
-                    id="password"
-                    formControlName="password"
-                    placeholder="••••••••"
-                    [class.error]="f.password.touched && f.password.invalid"
-                >
+                <div class="password-wrapper">
+                    <input
+                        [type]="showPassword() ? 'text' : 'password'"
+                        id="password"
+                        formControlName="password"
+                        placeholder="••••••••"
+                        [class.error]="f.password.touched && f.password.invalid"
+                    >
+
+                    @if (f.password.value) {
+                        <button
+                            type="button"
+                            class="toggle-password"
+                            (click)="showPassword.set(!showPassword())"
+                            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+                        >
+                            @if (showPassword()) {
+                                <!-- Eye-off icon -->
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M3 3l18 18"/>
+                                    <path d="M10.58 10.58a2 2 0 0 0 2.83 2.83"/>
+                                    <path d="M9.88 5.09A10.6 10.6 0 0 1 12 5 c5 0 9 5 9 7a9.4 9.4 0 0 1-2.16 3.19"/>
+                                    <path d="M6.61 6.61C3.94 8.42 3 11 3 12 c0 2 4 7 9 7a10.6 10.6 0 0 0 4.11-.82"/>
+                                </svg>
+                            } @else {
+                                <!-- Eye icon -->
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            }
+                        </button>
+                    }
+                </div>
 
                 @if (f.password.touched && f.password.invalid) {
                     <small class="error-message">
-
                         @if (f.password.errors?.['required']) {
                             Password is required
                         }
@@ -65,44 +99,37 @@
                         @if (f.password.errors?.['minlength']) {
                             Password must be at least 8 characters
                         }
-
                     </small>
                 }
-
             </div>
 
+            <!-- Forgot Password -->
             <div class="form-actions">
-
                 <a routerLink="/auth/forgot-password" class="link">
                     Forgot password?
                 </a>
-
             </div>
 
+            <!-- Submit -->
             <button
                 type="submit"
                 class="btn btn-primary"
                 [disabled]="isLoading()"
             >
-
                 @if (isLoading()) {
                     Signing in...
                 } @else {
                     Sign In
                 }
-
             </button>
 
         </form>
 
+        <!-- Footer -->
         <p class="auth-footer">
-
             Don't have an account?
-
             <a routerLink="/auth/register" class="link">Sign up</a>
-
         </p>
 
     </div>
-
 </div>
